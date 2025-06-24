@@ -2,7 +2,6 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -198,7 +197,7 @@ const selectVehicle = (vehicle: (typeof mockVehicles)[0]) => {
               </div>
               <img
                 v-if="selectedVehicle.image == null"
-                src="/public/images/scooter.png"
+                src="/images/scooter.png"
                 alt="Default Vehicle Image"
                 class="w-24 h-24 mx-auto rounded-xl"
               />

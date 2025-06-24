@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { ref } from "vue";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -13,8 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { ChevronLeft } from "lucide-vue-next";
-
-const route = useRoute();
 
 const mockVehicle = {
   brand: "AKT",
@@ -25,6 +21,7 @@ const mockVehicle = {
   fuel_type: "gasoline",
   cylinder_capacity: 124,
   tire_size: "18-18",
+  image: null,
 };
 const mockVehicleRents = [
   {
@@ -157,9 +154,6 @@ const otherEvents = ref(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 );
-onMounted(() => {
-  const plate = route.params.plate as string;
-});
 </script>
 
 <template>
@@ -172,7 +166,7 @@ onMounted(() => {
         <div class="flex">
           <img
             v-if="mockVehicle.image == null"
-            src="/public/images/scooter.png"
+            src="/images/scooter.png"
             alt="Default Vehicle Image"
             class="w-32 h-32 rounded-xl"
           />
