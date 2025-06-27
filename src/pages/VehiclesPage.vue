@@ -141,9 +141,28 @@ const selectVehicle = (vehicle: (typeof mockVehicles)[0]) => {
 </script>
 <template>
   <main class="flex flex-col items-center justify-center w-full">
-    <h1 class="text-2xl font-bold mb-12 self-start ml-[5%]">Vehicles</h1>
+    <h1 class="text-2xl font-bold mb-6 self-start ml-[5%]">Vehicles</h1>
+    <div class="flex gap-4 mt-4 flex-wrap self-start ml-[5%]">
+      <div
+        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
+      >
+        <p class="text-lg font-semibold text-blue-500">3</p>
+        <span class="text-xs text-gray-500 font-light">Rented</span>
+      </div>
+      <div
+        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
+      >
+        <p class="text-lg font-semibold text-green-500">5</p>
+        <span class="text-xs text-gray-500 font-light">Available</span>
+      </div>
+      <div
+        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
+      >
+        <p class="text-lg font-semibold text-orange-500">2</p>
+        <span class="text-xs text-gray-500 font-light">Maintenence</span>
+      </div>
+    </div>
     <section class="flex flex-wrap gap-4 w-[90%]">
-      <!-- <div class="col-span-2 row-span-5 bg-red-50"></div> -->
       <div class="flex-grow">
         <Table class="overflow-x-hidden min-w-[400px]">
           <TableHeader>
