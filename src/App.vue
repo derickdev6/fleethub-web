@@ -7,7 +7,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
   <SidebarProvider>
     <AppSidebar />
     <SidebarTrigger />
-    <router-view />
+    <router-view class="py-8" />
   </SidebarProvider>
 </template>
 

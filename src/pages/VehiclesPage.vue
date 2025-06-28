@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableHeader,
+  DataTableHeaderCell,
+  DataTablePagination,
+  DataTableRow,
+} from "@/components/data-table";
 import { Button } from "@/components/ui/button";
+import { Plus, Download } from "lucide-vue-next";
+
 import {
   Card,
   CardContent,
@@ -19,129 +22,72 @@ import {
 
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
+import vehicles from "@/store/mock/vehicles.json";
 
-const mockVehicles = [
-  {
-    brand: "Yamaha",
-    model: "Bwis",
-    plate_number: "AAA111",
-    status: "available",
-    acquired_date: "2025-06-18",
-    fuel_type: "gasoline",
-    cylinder_capacity: 155,
-    tire_size: "15-15",
-    image: "https://picsum.photos/id/200/800",
-  },
-  {
-    brand: "Honda",
-    model: "XR150",
-    plate_number: "BBB222",
-    status: "maintenance",
-    acquired_date: "2024-12-01",
-    fuel_type: "gasoline",
-    cylinder_capacity: 149,
-    tire_size: "19-17",
-    image: "https://picsum.photos/id/201/800",
-  },
-  {
-    brand: "Suzuki",
-    model: "GN125",
-    plate_number: "CCC333",
-    status: "available",
-    acquired_date: "2023-08-22",
-    fuel_type: "gasoline",
-    cylinder_capacity: 125,
-    tire_size: "18-16",
-    image: "https://picsum.photos/id/202/800",
-  },
-  {
-    brand: "KTM",
-    model: "Duke 200",
-    plate_number: "DDD444",
-    status: "rented",
-    acquired_date: "2025-01-15",
-    fuel_type: "gasoline",
-    cylinder_capacity: 199,
-    tire_size: "17-17",
-  },
-  {
-    brand: "TVS",
-    model: "Apache 160",
-    plate_number: "EEE555",
-    status: "available",
-    acquired_date: "2023-05-10",
-    fuel_type: "gasoline",
-    cylinder_capacity: 160,
-    tire_size: "17-17",
-  },
-  {
-    brand: "Yamaha",
-    model: "Bws",
-    plate_number: "FFF666",
-    status: "available",
-    acquired_date: "2024-07-19",
-    fuel_type: "gasoline",
-    cylinder_capacity: 155,
-    tire_size: "15-15",
-  },
-  {
-    brand: "AKT",
-    model: "NKD 125",
-    plate_number: "GGG777",
-    status: "rented",
-    acquired_date: "2022-11-03",
-    fuel_type: "gasoline",
-    cylinder_capacity: 124,
-    tire_size: "18-18",
-  },
-  {
-    brand: "Hero",
-    model: "Eco Deluxe",
-    plate_number: "HHH888",
-    status: "rented",
-    acquired_date: "2021-03-25",
-    fuel_type: "gasoline",
-    cylinder_capacity: 97,
-    tire_size: "18-18",
-  },
-  {
-    brand: "Yamaha",
-    model: "FZ-S",
-    plate_number: "III999",
-    status: "available",
-    acquired_date: "2024-10-10",
-    fuel_type: "gasoline",
-    cylinder_capacity: 149,
-    tire_size: "17-17",
-  },
-  {
-    brand: "Honda",
-    model: "CB190R",
-    plate_number: "JJJ000",
-    status: "maintenance",
-    acquired_date: "2025-02-28",
-    fuel_type: "gasoline",
-    cylinder_capacity: 184,
-    tire_size: "17-17",
-  },
-];
-const vehicles = ref(
-  mockVehicles.sort((a, b) => {
-    return a.brand.localeCompare(b.brand);
-  })
-);
+import {
+  useVueTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  FlexRender,
+} from "@tanstack/vue-table";
+
+const mockVehicles = ref(vehicles);
 
 const selectedVehicle = ref(
   typeof mockVehicles[0] === "object" ? mockVehicles[0] : null
 );
 const selectVehicle = (vehicle: (typeof mockVehicles)[0]) => {
-  selectedVehicle.value = vehicle;
-  console.log("Selected Vehicle:", vehicle);
+  if (selectedVehicle.value?.plate_number === vehicle.plate_number) {
+    selectedVehicle.value = null; // Deselect if it's already selected
+  } else {
+    selectedVehicle.value = vehicle; // Select new one
+  }
 };
+const columns = ref([
+  { header: () => "Brand", accessorKey: "brand" },
+  { header: () => "Model", accessorKey: "model" },
+  {
+    header: () => "Plate Number",
+    accessorKey: "plate_number",
+    enableSorting: false,
+  },
+  { header: () => "Status", accessorKey: "status", enableSorting: false },
+]);
+const table = useVueTable({
+  data: mockVehicles.value,
+  columns: columns.value,
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  initialState: {
+    pagination: {
+      pageSize: 10,
+    },
+  },
+});
 </script>
 <template>
-  <main class="flex flex-col items-center justify-center w-full">
-    <h1 class="text-2xl font-bold mb-6 self-start ml-[5%]">Vehicles</h1>
+  <main class="flex flex-col items-center w-full">
+    <div class="flex justify-between items-center w-[90%]">
+      <div class="">
+        <h1 class="text-2xl font-bold">Vehicles</h1>
+        <p class="text-md font-light text-gray-600">
+          Manage your vehicle fleet
+        </p>
+      </div>
+
+      <div class="flex gap-2">
+        <Button variant="secondary" class="cursor-pointer"
+          ><Download></Download>Export</Button
+        >
+        <Button variant="outline" class="cursor-pointer"
+          ><Plus></Plus> New vehicle</Button
+        >
+      </div>
+    </div>
     <div class="flex gap-4 mt-4 flex-wrap self-start ml-[5%]">
       <div
         class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
@@ -164,43 +110,68 @@ const selectVehicle = (vehicle: (typeof mockVehicles)[0]) => {
     </div>
     <section class="flex flex-wrap gap-4 w-[90%]">
       <div class="flex-grow">
-        <Table class="overflow-x-hidden min-w-[400px]">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Brand</TableHead>
-              <TableHead>Model</TableHead>
-              <TableHead>Plate Number</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow
-              v-for="vehicle in vehicles"
-              :key="vehicle.plate_number"
-              @click="selectVehicle(vehicle)"
-              class="cursor-pointer transition-colors"
-              :class="{
-                'active-background text-black':
-                  selectedVehicle?.plate_number === vehicle.plate_number,
-                'hover:bg-muted':
-                  selectedVehicle?.plate_number !== vehicle.plate_number,
-              }"
+        <DataTablePagination :table="table" class="mt-4" />
+
+        <DataTable>
+          <DataTableHeader>
+            <DataTableRow
+              v-for="headerGroup in table.getHeaderGroups()"
+              :key="headerGroup.id"
             >
-              <TableCell>{{ vehicle.brand }}</TableCell>
-              <TableCell>{{ vehicle.model }}</TableCell>
-              <TableCell>{{ vehicle.plate_number }}</TableCell>
-              <TableCell>
-                <div :class="['status-indicator', vehicle.status]"></div>
-                {{ vehicle.status }}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+              <DataTableHeaderCell
+                v-for="header in headerGroup.headers"
+                :key="header.id"
+                :header="header"
+              >
+                <FlexRender
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
+                />
+              </DataTableHeaderCell>
+            </DataTableRow>
+          </DataTableHeader>
+
+          <DataTableBody>
+            <template v-if="table.getRowModel().rows.length">
+              <DataTableRow
+                v-for="row in table.getRowModel().rows"
+                :key="row.id"
+                class="cursor-pointer"
+                :class="{
+                  'hover:bg-muted': true,
+                  'active-background':
+                    selectedVehicle?.plate_number === row.original.plate_number,
+                }"
+                @click="selectVehicle(row.original)"
+              >
+                <DataTableCell
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                  class="whitespace-nowrap"
+                >
+                  <FlexRender
+                    :render="cell.column.columnDef.cell"
+                    :props="cell.getContext()"
+                  />
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+            <template v-else>
+              <DataTableRow>
+                <DataTableCell
+                  class="text-center text-muted-foreground"
+                  :colspan="columns.length"
+                >
+                  No results.
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+          </DataTableBody>
+        </DataTable>
       </div>
-      <div class="w-[30%]">
+      <div class="w-[30%]" v-if="selectedVehicle">
         <Card
-          v-if="selectedVehicle"
-          class="w-full h-full details-card min-w-[300px]"
+          class="w-full details-card min-w-[300px] max-h-100 max-w-80 sticky top-6"
           :class="[selectedVehicle.status]"
         >
           <CardHeader>
@@ -257,9 +228,6 @@ const selectVehicle = (vehicle: (typeof mockVehicles)[0]) => {
             <Button variant="outline" class="w-[48%]"> Event </Button>
           </CardFooter>
         </Card>
-        <p v-else class="text-muted-foreground text-center mt-10">
-          Selecciona un vehículo para ver los detalles
-        </p>
       </div>
     </section>
   </main>

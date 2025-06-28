@@ -1,165 +1,70 @@
 <script setup lang="ts">
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableHeader,
+  DataTableHeaderCell,
+  DataTablePagination,
+  DataTableRow,
+} from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { Plus, Download } from "lucide-vue-next";
+import rents from "@/store/mock/rents.json";
+import { ref } from "vue";
+import {
+  useVueTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  FlexRender,
+} from "@tanstack/vue-table";
 
-const mockRents = [
+const mockRents = ref(rents);
+const columns = ref([
+  { header: () => "Vehicle", accessorKey: "vehicle", enableSorting: false },
   {
-    vehicle: "Yamaha Bwis",
-    clientName: "John Doe",
-    startDate: "2025-06-18",
-    endDate: "2025-06-25",
-    type: "touristic",
-    paymentFrequency: "daily",
-    payment: 115,
-    paymentBonus: 0,
-    totalPrice: 805,
-    status: "active",
+    header: () => "Vehicle ID",
+    accessorKey: "vehicleId",
+    enableSorting: false,
   },
+  { header: "Customer", accessorKey: "clientName", enableSorting: false },
   {
-    vehicle: "Honda XR150",
-    clientName: "Jane Smith",
-    startDate: "2024-12-01",
-    endDate: "2024-12-15",
-    type: "touristic",
-    paymentFrequency: "weekly",
-    payment: 500,
-    paymentBonus: 50,
-    totalPrice: 950,
-    status: "completed",
+    header: () => "Start Date",
+    accessorKey: "startDate",
+    sortingFn: "datetime",
   },
+  { header: () => "End Date", accessorKey: "endDate", sortingFn: "datetime" },
+  { header: "Type", accessorKey: "type", enableSorting: false },
   {
-    vehicle: "Suzuki GN125",
-    clientName: "Alice Johnson",
-    startDate: "2023-08-22",
-    endDate: "2023-09-05",
-    type: "working",
-    paymentFrequency: "monthly",
-    payment: 1100,
-    paymentBonus: 400,
-    totalPrice: 6600,
-    status: "active",
+    header: "Frequency",
+    accessorKey: "paymentFrequency",
+    enableSorting: false,
   },
-  {
-    vehicle: "KTM Duke 200",
-    clientName: "Bob Brown",
-    startDate: "2023-10-10",
-    endDate: "2023-10-20",
-    type: "touristic",
-    paymentFrequency: "daily",
-    payment: 150,
-    paymentBonus: 0,
-    totalPrice: 1500,
-    status: "active",
+  { header: "Payment", accessorKey: "payment" },
+  { header: "Bonus", accessorKey: "paymentBonus" },
+  { header: "Total", accessorKey: "totalPrice" },
+  { header: "Status", accessorKey: "status", enableSorting: false },
+]);
+
+const table = useVueTable({
+  data: mockRents.value,
+  columns: columns.value,
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  initialState: {
+    pagination: {
+      pageSize: 10,
+    },
   },
-  {
-    vehicle: "Kawasaki Ninja 250",
-    clientName: "Charlie Green",
-    startDate: "2023-11-05",
-    endDate: "2023-11-12",
-    type: "touristic",
-    paymentFrequency: "weekly",
-    payment: 600,
-    paymentBonus: 50,
-    totalPrice: 4100,
-    status: "completed",
-  },
-  {
-    vehicle: "TVS Apache 160",
-    clientName: "David White",
-    startDate: "2023-05-10",
-    endDate: "2023-05-20",
-    type: "working",
-    paymentFrequency: "monthly",
-    payment: 1200,
-    paymentBonus: 300,
-    totalPrice: 7200,
-    status: "active",
-  },
-  {
-    vehicle: "Yamaha Bws",
-    clientName: "Eve Black",
-    startDate: "2024-07-19",
-    endDate: "2024-07-26",
-    type: "touristic",
-    paymentFrequency: "daily",
-    payment: 115,
-    paymentBonus: 0,
-    totalPrice: 805,
-    status: "active",
-  },
-  {
-    vehicle: "AKT NKD 125",
-    clientName: "Frank Blue",
-    startDate: "2022-11-03",
-    endDate: "2022-11-10",
-    type: "working",
-    paymentFrequency: "weekly",
-    payment: 400,
-    paymentBonus: 50,
-    totalPrice: 2450,
-    status: "completed",
-  },
-  {
-    vehicle: "Hero Eco Deluxe",
-    clientName: "Grace Yellow",
-    startDate: "2021-03-25",
-    endDate: "2021-04-01",
-    type: "touristic",
-    paymentFrequency: "daily",
-    payment: 100,
-    paymentBonus: 0,
-    totalPrice: 700,
-    status: "completed",
-  },
-  {
-    vehicle: "Yamaha FZ-S",
-    clientName: "Hank Purple",
-    startDate: "2024-10-10",
-    endDate: "2024-10-17",
-    type: "working",
-    paymentFrequency: "monthly",
-    payment: 1300,
-    paymentBonus: 400,
-    totalPrice: 7800,
-    status: "active",
-  },
-  {
-    vehicle: "Honda CB190R",
-    clientName: "Ivy Orange",
-    startDate: "2023-09-15",
-    endDate: "2023-09-22",
-    type: "touristic",
-    paymentFrequency: "weekly",
-    payment: 550,
-    paymentBonus: 50,
-    totalPrice: 3600,
-    status: "completed",
-  },
-  {
-    vehicle: "Kawasaki Z400",
-    clientName: "Jack Pink",
-    startDate: "2023-06-30",
-    endDate: "2023-07-07",
-    type: "working",
-    paymentFrequency: "daily",
-    payment: 200,
-    paymentBonus: 0,
-    totalPrice: 1400,
-    status: "completed",
-  },
-];
+});
 </script>
 
 <template>
-  <main class="flex flex-col items-center justify-center w-full">
+  <main class="flex flex-col items-center w-full">
     <div class="flex justify-between items-center w-[90%]">
       <div class="">
         <h1 class="text-2xl font-bold">Rents</h1>
@@ -182,55 +87,75 @@ const mockRents = [
         class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
       >
         <p class="text-lg font-semibold text-blue-500">3</p>
-        <span class="text-xs text-gray-500 font-light">Rented</span>
+        <span class="text-xs text-gray-500 font-light">Active</span>
       </div>
       <div
         class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
       >
-        <p class="text-lg font-semibold text-green-500">5</p>
-        <span class="text-xs text-gray-500 font-light">Available</span>
+        <p class="text-lg font-semibold text-green-500">22</p>
+        <span class="text-xs text-gray-500 font-light">Completed</span>
       </div>
       <div
         class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
       >
-        <p class="text-lg font-semibold text-orange-500">2</p>
-        <span class="text-xs text-gray-500 font-light">Maintenence</span>
+        <p class="text-lg font-semibold text-red-500">5</p>
+        <span class="text-xs text-gray-500 font-light">Cancelled</span>
       </div>
     </div>
     <section class="flex flex-wrap gap-4 w-[90%]">
       <div class="flex-grow">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Vehicle</TableHead>
-              <TableHead>Client Name</TableHead>
-              <TableHead>Start Date</TableHead>
-              <TableHead>End Date</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Payment Frequency</TableHead>
-              <TableHead>Payment</TableHead>
-              <TableHead>Payment Bonus</TableHead>
-              <TableHead>Total Price</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <template v-for="rent in mockRents" :key="rent.vehicle">
-              <TableRow class="hover:bg-gray-100">
-                <TableCell>{{ rent.vehicle }}</TableCell>
-                <TableCell>{{ rent.clientName }}</TableCell>
-                <TableCell>{{ rent.startDate }}</TableCell>
-                <TableCell>{{ rent.endDate }}</TableCell>
-                <TableCell>{{ rent.type }}</TableCell>
-                <TableCell>{{ rent.paymentFrequency }}</TableCell>
-                <TableCell>{{ rent.payment }}</TableCell>
-                <TableCell>{{ rent.paymentBonus }}</TableCell>
-                <TableCell>{{ rent.totalPrice }}</TableCell>
-                <TableCell>{{ rent.status }}</TableCell>
-              </TableRow>
+        <DataTablePagination :table="table" class="mt-4" />
+
+        <DataTable>
+          <DataTableHeader>
+            <DataTableRow
+              v-for="headerGroup in table.getHeaderGroups()"
+              :key="headerGroup.id"
+            >
+              <DataTableHeaderCell
+                v-for="header in headerGroup.headers"
+                :key="header.id"
+                :header="header"
+              >
+                <FlexRender
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
+                />
+              </DataTableHeaderCell>
+            </DataTableRow>
+          </DataTableHeader>
+
+          <DataTableBody>
+            <template v-if="table.getRowModel().rows.length">
+              <DataTableRow
+                v-for="row in table.getRowModel().rows"
+                :key="row.id"
+                class="hover:bg-muted cursor-pointer"
+              >
+                <DataTableCell
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                  class="whitespace-nowrap"
+                >
+                  <FlexRender
+                    :render="cell.column.columnDef.cell"
+                    :props="cell.getContext()"
+                  />
+                </DataTableCell>
+              </DataTableRow>
             </template>
-          </TableBody>
-        </Table>
+            <template v-else>
+              <DataTableRow>
+                <DataTableCell
+                  class="text-center text-muted-foreground"
+                  :colspan="columns.length"
+                >
+                  No results.
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+          </DataTableBody>
+        </DataTable>
       </div>
     </section>
   </main>
