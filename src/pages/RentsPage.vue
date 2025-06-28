@@ -1,3 +1,4 @@
+// RentsPage.vue
 <script setup lang="ts">
 import { h } from "vue";
 import {
@@ -19,11 +20,11 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   FlexRender,
-  ColumnDef,
+  type ColumnDef,
+  type CellContext,
 } from "@tanstack/vue-table";
 import rents from "@/store/mock/rents.json";
 
-const mockRents = ref(rents);
 interface Rent {
   vehicle: string;
   vehicleId: string;
@@ -37,6 +38,9 @@ interface Rent {
   totalPrice: number;
   status: string;
 }
+
+const mockRents = ref<Rent[]>(rents);
+
 const columns: ColumnDef<Rent, any>[] = [
   { header: "Vehicle", accessorKey: "vehicle", enableSorting: false },
   { header: "Plate", accessorKey: "vehicleId", enableSorting: false },
@@ -44,24 +48,19 @@ const columns: ColumnDef<Rent, any>[] = [
   {
     header: "Start Date",
     accessorKey: "startDate",
-    sortingFn: (rowA, rowB, columnId) => {
-      const a = new Date(rowA.getValue(columnId)).getTime();
-      const b = new Date(rowB.getValue(columnId)).getTime();
-      return a - b;
-    },
-    cell: (info: any) => new Date(info.getValue()).toLocaleDateString(),
+    sortingFn: (a, b, id) =>
+      new Date(a.getValue(id)).getTime() - new Date(b.getValue(id)).getTime(),
+    cell: (info: CellContext<Rent, string>) =>
+      new Date(info.getValue()).toLocaleDateString(),
   },
   {
     header: "End Date",
     accessorKey: "endDate",
-    sortingFn: (rowA, rowB, columnId) => {
-      const a = new Date(rowA.getValue(columnId)).getTime();
-      const b = new Date(rowB.getValue(columnId)).getTime();
-      return a - b;
-    },
-    cell: (info: any) => new Date(info.getValue()).toLocaleDateString(),
+    sortingFn: (a, b, id) =>
+      new Date(a.getValue(id)).getTime() - new Date(b.getValue(id)).getTime(),
+    cell: (info: CellContext<Rent, string>) =>
+      new Date(info.getValue()).toLocaleDateString(),
   },
-  // { header: "Type", accessorKey: "type", enableSorting: false },
   {
     header: "Frequency",
     accessorKey: "paymentFrequency",
@@ -70,26 +69,24 @@ const columns: ColumnDef<Rent, any>[] = [
   {
     header: "Payment",
     accessorKey: "payment",
-    cell: (info: any) => `$${info.getValue().toFixed(2)}`,
+    cell: (info: CellContext<Rent, number>) => `$${info.getValue().toFixed(2)}`,
   },
   {
     header: "Bonus",
     accessorKey: "paymentBonus",
-    cell: (info: any) => `$${info.getValue().toFixed(2)}`,
+    cell: (info: CellContext<Rent, number>) => `$${info.getValue().toFixed(2)}`,
   },
   {
     header: "Total",
     accessorKey: "totalPrice",
-    cell: (info: any) => `$${info.getValue().toFixed(2)}`,
+    cell: (info: CellContext<Rent, number>) => `$${info.getValue().toFixed(2)}`,
   },
   {
     header: "Status",
     accessorKey: "status",
-    cell: (info: any) => {
-      const status = info.getValue();
-      return getStatusIndicator(status);
-    },
     enableSorting: false,
+    cell: (info: CellContext<Rent, string>) =>
+      getStatusIndicator(info.getValue()),
   },
 ];
 
@@ -100,11 +97,7 @@ const table = useVueTable({
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
-  initialState: {
-    pagination: {
-      pageSize: 10,
-    },
-  },
+  initialState: { pagination: { pageSize: 10 } },
 });
 
 function getStatusIndicator(status: string) {
@@ -114,17 +107,10 @@ function getStatusIndicator(status: string) {
     cancelled: "bg-red-500",
   };
 
-  const labelMap: Record<string, string> = {
-    active: "Active",
-    completed: "Completed",
-    cancelled: "Cancelled",
-  };
-
   const dotClass = `w-2 h-2 rounded-full ${colorMap[status] ?? "bg-gray-400"}`;
 
   return h("div", { class: "flex items-center gap-2 ml-4" }, [
     h("span", { class: dotClass }),
-    // h("span", { class: "text-sm text-gray-700" }, labelMap[status] ?? status),
   ]);
 }
 </script>
@@ -167,7 +153,6 @@ function getStatusIndicator(status: string) {
 
     <section class="w-[90%]">
       <DataTablePagination :table="table" class="mb-4" />
-
       <DataTable>
         <DataTableHeader>
           <DataTableRow
@@ -210,7 +195,7 @@ function getStatusIndicator(status: string) {
             <DataTableRow>
               <DataTableCell
                 class="text-center text-muted-foreground"
-                :colspan="columns.length"
+                :colspan="table.getAllColumns().length"
               >
                 No results.
               </DataTableCell>

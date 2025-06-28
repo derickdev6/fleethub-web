@@ -5,12 +5,11 @@ import {
   DataTableCell,
   DataTableHeader,
   DataTableHeaderCell,
-  DataTablePagination,
+  // DataTablePagination,
   DataTableRow,
 } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
-import { Plus, Download } from "lucide-vue-next";
-import rents from "@/store/mock/rents.json";
+import { ChevronLeft } from "lucide-vue-next";
 import { ref } from "vue";
 import {
   useVueTable,
@@ -20,9 +19,45 @@ import {
   getFilteredRowModel,
   FlexRender,
 } from "@tanstack/vue-table";
-import { ChevronLeft } from "lucide-vue-next";
 
-const mockVehicle = {
+interface Vehicle {
+  brand: string;
+  model: string;
+  plate_number: string;
+  status: string;
+  acquired_date: string;
+  fuel_type: string;
+  cylinder_capacity: number;
+  tire_size: string;
+  image: string | null;
+}
+
+interface Rent {
+  id: number;
+  client: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  total_price: number;
+}
+
+interface Maintenance {
+  id: number;
+  type: string;
+  date: string;
+  description: string;
+  address: string;
+  cost: number;
+}
+
+interface Event {
+  id: number;
+  name: string;
+  date: string;
+  description: string;
+}
+
+const mockVehicle: Vehicle = {
   brand: "AKT",
   model: "NKD 125",
   plate_number: "AAA111",
@@ -33,257 +68,198 @@ const mockVehicle = {
   tire_size: "18-18",
   image: null,
 };
-const mockVehicleRents = [
-  {
-    id: 1,
-    client: "John Doe",
-    start_date: "2025-05-01",
-    end_date: "2025-05-05",
-    status: "completed",
-    total_price: 265,
-  },
-  {
-    id: 2,
-    client: "Jane Smith",
-    start_date: "2025-05-10",
-    end_date: "2025-05-14",
-    status: "completed",
-    total_price: 300,
-  },
-  {
-    id: 3,
-    client: "Alice Johnson",
-    start_date: "2025-05-20",
-    end_date: "2025-05-24",
-    status: "completed",
-    total_price: 280,
-  },
-  {
-    id: 4,
-    client: "Bob Brown",
-    start_date: "2025-05-28",
-    end_date: "2025-06-01",
-    status: "completed",
-    total_price: 320,
-  },
-  {
-    id: 5,
-    client: "Charlie Green",
-    start_date: "2025-06-03",
-    end_date: "2025-06-07",
-    status: "completed",
-    total_price: 290,
-  },
-  {
-    id: 6,
-    client: "Diana White",
-    start_date: "2025-06-10",
-    end_date: "2025-06-14",
-    status: "active",
-    total_price: 310,
-  },
-];
 
-const vehicleRents = ref(
-  mockVehicleRents.sort(
+const vehicleRents = ref<Rent[]>(
+  [
+    {
+      id: 1,
+      client: "John Doe",
+      start_date: "2025-05-01",
+      end_date: "2025-05-05",
+      status: "completed",
+      total_price: 265,
+    },
+    {
+      id: 2,
+      client: "Jane Smith",
+      start_date: "2025-05-10",
+      end_date: "2025-05-14",
+      status: "completed",
+      total_price: 300,
+    },
+    {
+      id: 3,
+      client: "Alice Johnson",
+      start_date: "2025-05-20",
+      end_date: "2025-05-24",
+      status: "completed",
+      total_price: 280,
+    },
+    {
+      id: 4,
+      client: "Bob Brown",
+      start_date: "2025-05-28",
+      end_date: "2025-06-01",
+      status: "completed",
+      total_price: 320,
+    },
+    {
+      id: 5,
+      client: "Charlie Green",
+      start_date: "2025-06-03",
+      end_date: "2025-06-07",
+      status: "completed",
+      total_price: 290,
+    },
+    {
+      id: 6,
+      client: "Diana White",
+      start_date: "2025-06-10",
+      end_date: "2025-06-14",
+      status: "active",
+      total_price: 310,
+    },
+  ].sort(
     (a, b) =>
       new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
   )
 );
 
-const mockMaintenanceRecords = [
-  {
-    id: 1,
-    type: "periodic",
-    date: "2024-09-15",
-    description: "Oil change and tire rotation",
-    address: "123 Main St, City, Country",
-    cost: 50,
-  },
-  {
-    id: 2,
-    type: "repair",
-    date: "2024-10-01",
-    description: "Brake pad replacement",
-    address: "456 Elm St, City, Country",
-    cost: 75,
-  },
-  {
-    id: 3,
-    type: "repair",
-    date: "2024-10-10",
-    description: "Chain replacement",
-    address: "789 Oak St, City, Country",
-    cost: 100,
-  },
-  {
-    id: 4,
-    type: "periodic",
-    date: "2024-10-20",
-    description: "Tire pressure check and adjustment",
-    address: "101 Pine St, City, Country",
-    cost: 30,
-  },
-  {
-    id: 5,
-    type: "repair",
-    date: "2024-10-25",
-    description: "Clutch adjustment",
-    address: "102 Maple St, City, Country",
-    cost: 40,
-  },
-];
-const maintenanceRecords = ref(
-  mockMaintenanceRecords.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
+const maintenanceRecords = ref<Maintenance[]>(
+  [
+    {
+      id: 1,
+      type: "periodic",
+      date: "2024-09-15",
+      description: "Oil change",
+      address: "123 Main St",
+      cost: 50,
+    },
+    {
+      id: 2,
+      type: "repair",
+      date: "2024-10-01",
+      description: "Brake pad",
+      address: "456 Elm St",
+      cost: 75,
+    },
+    {
+      id: 3,
+      type: "repair",
+      date: "2024-10-10",
+      description: "Chain",
+      address: "789 Oak St",
+      cost: 100,
+    },
+    {
+      id: 4,
+      type: "periodic",
+      date: "2024-10-20",
+      description: "Tire check",
+      address: "101 Pine St",
+      cost: 30,
+    },
+    {
+      id: 5,
+      type: "repair",
+      date: "2024-10-25",
+      description: "Clutch",
+      address: "102 Maple St",
+      cost: 40,
+    },
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 );
 
-const mockOtherEvents = [
-  {
-    id: 1,
-    name: "accident",
-    date: "2024-10-05",
-    description: "Minor accident with no injuries",
-  },
-  {
-    id: 2,
-    name: "theft",
-    date: "2024-10-15",
-    description: "Vehicle stolen from parking lot",
-  },
-  {
-    id: 3,
-    name: "crash",
-    date: "2024-10-20",
-    description: "Vehicle crashed into a wall",
-  },
-];
-const otherEvents = ref(
-  mockOtherEvents.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
+const otherEvents = ref<Event[]>(
+  [
+    {
+      id: 1,
+      name: "accident",
+      date: "2024-10-05",
+      description: "Minor accident",
+    },
+    { id: 2, name: "theft", date: "2024-10-15", description: "Vehicle stolen" },
+    {
+      id: 3,
+      name: "crash",
+      date: "2024-10-20",
+      description: "Crashed into wall",
+    },
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 );
 
-const vehicleRentsColumns = ref([
-  {
-    header: "Client",
-    accessorKey: "client",
-    enableSorting: false,
-  },
-  {
-    header: "Start Date",
-    accessorKey: "start_date",
-    sortingFn: "datetime",
-    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
-  },
-  {
-    header: "End Date",
-    accessorKey: "end_date",
-    sortingFn: "datetime",
-    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
-  },
-  {
-    header: "Status",
-    accessorKey: "status",
-    enableSorting: false,
-  },
-  {
-    header: "Total Price",
-    accessorKey: "total_price",
-    cell: (info) => `$${info.getValue().toFixed(2)}`,
-  },
-]);
-
-const vehicleMaintenanceColumns = ref([
-  {
-    header: "Type",
-    accessorKey: "type",
-    enableSorting: false,
-  },
-  {
-    header: "Date",
-    accessorKey: "date",
-    sortingFn: "datetime",
-    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
-  },
-  {
-    header: "Description",
-    accessorKey: "description",
-    enableSorting: false,
-    maxSize: 100,
-  },
-  {
-    header: "Address",
-    accessorKey: "address",
-    enableSorting: false,
-  },
-  {
-    header: "Cost",
-    accessorKey: "cost",
-    cell: (info) => `$${info.getValue().toFixed(2)}`,
-  },
-]);
-
-const vehicleOtherEventsColumns = ref([
-  {
-    header: "Name",
-    accessorKey: "name",
-    enableSorting: false,
-  },
-  {
-    header: "Date",
-    accessorKey: "date",
-    sortingFn: "datetime",
-    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
-  },
-  {
-    header: "Description",
-    accessorKey: "description",
-    enableSorting: false,
-  },
-]);
+const createDateCell = (info: any) =>
+  new Date(info.getValue()).toLocaleDateString();
+const createPriceCell = (info: any) => `$${info.getValue().toFixed(2)}`;
 
 const rentsTable = useVueTable({
   data: vehicleRents.value,
-  columns: vehicleRentsColumns.value,
+  columns: [
+    { header: "Client", accessorKey: "client", enableSorting: false },
+    {
+      header: "Start Date",
+      accessorKey: "start_date",
+      sortingFn: "datetime",
+      cell: createDateCell,
+    },
+    {
+      header: "End Date",
+      accessorKey: "end_date",
+      sortingFn: "datetime",
+      cell: createDateCell,
+    },
+    { header: "Status", accessorKey: "status", enableSorting: false },
+    {
+      header: "Total Price",
+      accessorKey: "total_price",
+      cell: createPriceCell,
+    },
+  ],
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
-  initialState: {
-    pagination: {
-      pageSize: 10,
-    },
-  },
+  initialState: { pagination: { pageSize: 10 } },
 });
 
 const maintenanceTable = useVueTable({
   data: maintenanceRecords.value,
-  columns: vehicleMaintenanceColumns.value,
+  columns: [
+    { header: "Type", accessorKey: "type", enableSorting: false },
+    {
+      header: "Date",
+      accessorKey: "date",
+      sortingFn: "datetime",
+      cell: createDateCell,
+    },
+    { header: "Description", accessorKey: "description", enableSorting: false },
+    { header: "Address", accessorKey: "address", enableSorting: false },
+    { header: "Cost", accessorKey: "cost", cell: createPriceCell },
+  ],
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
-  initialState: {
-    pagination: {
-      pageSize: 10,
-    },
-  },
+  initialState: { pagination: { pageSize: 10 } },
 });
 
 const otherEventsTable = useVueTable({
   data: otherEvents.value,
-  columns: vehicleOtherEventsColumns.value,
+  columns: [
+    { header: "Name", accessorKey: "name", enableSorting: false },
+    {
+      header: "Date",
+      accessorKey: "date",
+      sortingFn: "datetime",
+      cell: createDateCell,
+    },
+    { header: "Description", accessorKey: "description", enableSorting: false },
+  ],
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
-  initialState: {
-    pagination: {
-      pageSize: 10,
-    },
-  },
+  initialState: { pagination: { pageSize: 10 } },
 });
 </script>
 
@@ -401,10 +377,7 @@ const otherEventsTable = useVueTable({
             </template>
             <template v-else>
               <DataTableRow>
-                <DataTableCell
-                  class="text-center text-muted-foreground"
-                  :colspan="columns.length"
-                >
+                <DataTableCell class="text-center text-muted-foreground">
                   No results.
                 </DataTableCell>
               </DataTableRow>
@@ -452,10 +425,7 @@ const otherEventsTable = useVueTable({
             </template>
             <template v-else>
               <DataTableRow>
-                <DataTableCell
-                  class="text-center text-muted-foreground"
-                  :colspan="columns.length"
-                >
+                <DataTableCell class="text-center text-muted-foreground">
                   No results.
                 </DataTableCell>
               </DataTableRow>
@@ -503,10 +473,7 @@ const otherEventsTable = useVueTable({
             </template>
             <template v-else>
               <DataTableRow>
-                <DataTableCell
-                  class="text-center text-muted-foreground"
-                  :colspan="columns.length"
-                >
+                <DataTableCell class="text-center text-muted-foreground">
                   No results.
                 </DataTableCell>
               </DataTableRow>
