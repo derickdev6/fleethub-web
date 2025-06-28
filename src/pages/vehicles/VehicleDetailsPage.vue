@@ -1,15 +1,25 @@
 <script setup lang="ts">
+import {
+  DataTable,
+  DataTableBody,
+  DataTableCell,
+  DataTableHeader,
+  DataTableHeaderCell,
+  DataTablePagination,
+  DataTableRow,
+} from "@/components/data-table";
+import { Button } from "@/components/ui/button";
+import { Plus, Download } from "lucide-vue-next";
+import rents from "@/store/mock/rents.json";
 import { ref } from "vue";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-
+  useVueTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  FlexRender,
+} from "@tanstack/vue-table";
 import { ChevronLeft } from "lucide-vue-next";
 
 const mockVehicle = {
@@ -154,15 +164,138 @@ const otherEvents = ref(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 );
+
+const vehicleRentsColumns = ref([
+  {
+    header: "Client",
+    accessorKey: "client",
+    enableSorting: false,
+  },
+  {
+    header: "Start Date",
+    accessorKey: "start_date",
+    sortingFn: "datetime",
+    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+  },
+  {
+    header: "End Date",
+    accessorKey: "end_date",
+    sortingFn: "datetime",
+    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+  },
+  {
+    header: "Status",
+    accessorKey: "status",
+    enableSorting: false,
+  },
+  {
+    header: "Total Price",
+    accessorKey: "total_price",
+    cell: (info) => `$${info.getValue().toFixed(2)}`,
+  },
+]);
+
+const vehicleMaintenanceColumns = ref([
+  {
+    header: "Type",
+    accessorKey: "type",
+    enableSorting: false,
+  },
+  {
+    header: "Date",
+    accessorKey: "date",
+    sortingFn: "datetime",
+    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+  },
+  {
+    header: "Description",
+    accessorKey: "description",
+    enableSorting: false,
+    maxSize: 100,
+  },
+  {
+    header: "Address",
+    accessorKey: "address",
+    enableSorting: false,
+  },
+  {
+    header: "Cost",
+    accessorKey: "cost",
+    cell: (info) => `$${info.getValue().toFixed(2)}`,
+  },
+]);
+
+const vehicleOtherEventsColumns = ref([
+  {
+    header: "Name",
+    accessorKey: "name",
+    enableSorting: false,
+  },
+  {
+    header: "Date",
+    accessorKey: "date",
+    sortingFn: "datetime",
+    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+  },
+  {
+    header: "Description",
+    accessorKey: "description",
+    enableSorting: false,
+  },
+]);
+
+const rentsTable = useVueTable({
+  data: vehicleRents.value,
+  columns: vehicleRentsColumns.value,
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  initialState: {
+    pagination: {
+      pageSize: 10,
+    },
+  },
+});
+
+const maintenanceTable = useVueTable({
+  data: maintenanceRecords.value,
+  columns: vehicleMaintenanceColumns.value,
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  initialState: {
+    pagination: {
+      pageSize: 10,
+    },
+  },
+});
+
+const otherEventsTable = useVueTable({
+  data: otherEvents.value,
+  columns: vehicleOtherEventsColumns.value,
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  initialState: {
+    pagination: {
+      pageSize: 10,
+    },
+  },
+});
 </script>
 
 <template>
-  <main class="flex flex-col items-center justify-center w-full py-12">
-    <RouterLink to="/vehicles" class="self-start ml-[5%]">
-      <ChevronLeft class="w-8 h-8" />
-    </RouterLink>
+  <main class="flex flex-col items-center w-full py-12">
     <section class="flex flex-wrap gap-4 w-[90%]">
-      <div class="w-[30%] flex flex-col min-w-[300px] overflow-hidden">
+      <div
+        class="w-[30%] flex flex-col min-w-[300px] max-h-100 max-w-80 xl:sticky xl:top-6 mb-10"
+      >
+        <RouterLink to="/vehicles" class="self-start">
+          <ChevronLeft class="w-8 h-8" />
+        </RouterLink>
         <div class="flex">
           <img
             v-if="mockVehicle.image == null"
@@ -227,69 +360,159 @@ const otherEvents = ref(
         </div>
       </div>
       <div class="flex flex-grow flex-col min-w-[300px]">
-        <h2 class="text-lg font-semibold mb-4">Vehicle Rents</h2>
-        <Table class="overflow-x-hidden mb-8">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Client</TableHead>
-              <TableHead>Start Date</TableHead>
-              <TableHead>End Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead class="text-right">Total Price</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow
-              v-for="rent in vehicleRents"
-              :key="rent.id"
-              :class="{ 'active-rent-background': rent.status === 'active' }"
+        <h2 class="text-lg font-semibold my-4">Vehicle Rents</h2>
+        <DataTable>
+          <DataTableHeader>
+            <DataTableRow
+              v-for="headerGroup in rentsTable.getHeaderGroups()"
+              :key="headerGroup.id"
             >
-              <TableCell>{{ rent.client }}</TableCell>
-              <TableCell>{{ rent.start_date }}</TableCell>
-              <TableCell>{{ rent.end_date }}</TableCell>
-              <TableCell>{{ rent.status }}</TableCell>
-              <TableCell class="text-right">${{ rent.total_price }}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-        <h2 class="text-lg font-semibold mb-4">Maintenance Records</h2>
-        <Table class="overflow-x-hidden mb-8">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Type</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead class="text-right">Cost</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="record in maintenanceRecords" :key="record.id">
-              <TableCell>{{ record.type }}</TableCell>
-              <TableCell>{{ record.date }}</TableCell>
-              <TableCell>{{ record.description }}</TableCell>
-              <TableCell>{{ record.address }}</TableCell>
-              <TableCell class="text-right">${{ record.cost }}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-        <h2 class="text-lg font-semibold mb-4">Other Events</h2>
-        <Table class="overflow-x-hidden">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="event in otherEvents" :key="event.id">
-              <TableCell>{{ event.name }}</TableCell>
-              <TableCell>{{ event.date }}</TableCell>
-              <TableCell>{{ event.description }}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+              <DataTableHeaderCell
+                v-for="header in headerGroup.headers"
+                :key="header.id"
+                :header="header"
+              >
+                <FlexRender
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
+                />
+              </DataTableHeaderCell>
+            </DataTableRow>
+          </DataTableHeader>
+
+          <DataTableBody>
+            <template v-if="rentsTable.getRowModel().rows.length">
+              <DataTableRow
+                v-for="row in rentsTable.getRowModel().rows"
+                :key="row.id"
+                class="hover:bg-muted cursor-pointer"
+              >
+                <DataTableCell
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                  class="whitespace-nowrap max-w-[200px] truncate"
+                >
+                  <FlexRender
+                    :render="cell.column.columnDef.cell"
+                    :props="cell.getContext()"
+                  />
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+            <template v-else>
+              <DataTableRow>
+                <DataTableCell
+                  class="text-center text-muted-foreground"
+                  :colspan="columns.length"
+                >
+                  No results.
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+          </DataTableBody>
+        </DataTable>
+        <h2 class="text-lg font-semibold my-4">Maintenance Records</h2>
+        <DataTable>
+          <DataTableHeader>
+            <DataTableRow
+              v-for="headerGroup in maintenanceTable.getHeaderGroups()"
+              :key="headerGroup.id"
+            >
+              <DataTableHeaderCell
+                v-for="header in headerGroup.headers"
+                :key="header.id"
+                :header="header"
+              >
+                <FlexRender
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
+                />
+              </DataTableHeaderCell>
+            </DataTableRow>
+          </DataTableHeader>
+
+          <DataTableBody>
+            <template v-if="maintenanceTable.getRowModel().rows.length">
+              <DataTableRow
+                v-for="row in maintenanceTable.getRowModel().rows"
+                :key="row.id"
+                class="hover:bg-muted cursor-pointer"
+              >
+                <DataTableCell
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                  class="whitespace-nowrap max-w-[200px] truncate"
+                >
+                  <FlexRender
+                    :render="cell.column.columnDef.cell"
+                    :props="cell.getContext()"
+                  />
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+            <template v-else>
+              <DataTableRow>
+                <DataTableCell
+                  class="text-center text-muted-foreground"
+                  :colspan="columns.length"
+                >
+                  No results.
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+          </DataTableBody>
+        </DataTable>
+        <h2 class="text-lg font-semibold my-4">Other Events</h2>
+        <DataTable>
+          <DataTableHeader>
+            <DataTableRow
+              v-for="headerGroup in otherEventsTable.getHeaderGroups()"
+              :key="headerGroup.id"
+            >
+              <DataTableHeaderCell
+                v-for="header in headerGroup.headers"
+                :key="header.id"
+                :header="header"
+              >
+                <FlexRender
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
+                />
+              </DataTableHeaderCell>
+            </DataTableRow>
+          </DataTableHeader>
+
+          <DataTableBody>
+            <template v-if="otherEventsTable.getRowModel().rows.length">
+              <DataTableRow
+                v-for="row in otherEventsTable.getRowModel().rows"
+                :key="row.id"
+                class="hover:bg-muted cursor-pointer"
+              >
+                <DataTableCell
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                  class="whitespace-nowrap"
+                >
+                  <FlexRender
+                    :render="cell.column.columnDef.cell"
+                    :props="cell.getContext()"
+                  />
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+            <template v-else>
+              <DataTableRow>
+                <DataTableCell
+                  class="text-center text-muted-foreground"
+                  :colspan="columns.length"
+                >
+                  No results.
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+          </DataTableBody>
+        </DataTable>
       </div>
     </section>
   </main>
