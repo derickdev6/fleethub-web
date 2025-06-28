@@ -205,7 +205,7 @@
     "payment": 256,
     "paymentBonus": 72,
     "totalPrice": 3423,
-    "status": "canceled"
+    "status": "cancelled"
   },
   {
     "vehicle": "BMW",
@@ -270,7 +270,7 @@
     "payment": 778,
     "paymentBonus": 227,
     "totalPrice": 1266,
-    "status": "canceled"
+    "status": "cancelled"
   },
   {
     "vehicle": "Pontiac",
@@ -400,7 +400,7 @@
     "payment": 259,
     "paymentBonus": 88,
     "totalPrice": 4118,
-    "status": "canceled"
+    "status": "cancelled"
   },
   {
     "vehicle": "Suzuki",

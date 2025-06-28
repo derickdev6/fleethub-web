@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { h } from "vue";
 import {
   DataTable,
   DataTableBody,
@@ -31,7 +32,9 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   FlexRender,
+  ColumnDef,
 } from "@tanstack/vue-table";
+import type { CellContext } from "@tanstack/vue-table";
 
 const mockVehicles = ref(vehicles);
 
@@ -45,15 +48,35 @@ const selectVehicle = (vehicle: (typeof mockVehicles)[0]) => {
     selectedVehicle.value = vehicle; // Select new one
   }
 };
+interface Vehicle {
+  brand: string;
+  model: string;
+  plate_number: string;
+  status: string;
+  image?: string | null;
+  acquired_date: string;
+  fuel_type: string;
+  cylinder_capacity: number;
+  tire_size: string;
+}
 const columns = ref([
-  { header: () => "Brand", accessorKey: "brand" },
-  { header: () => "Model", accessorKey: "model" },
+  { header: "Brand", accessorKey: "brand" },
+  { header: "Model", accessorKey: "model" },
   {
-    header: () => "Plate Number",
+    header: "Plate Number",
     accessorKey: "plate_number",
     enableSorting: false,
   },
-  { header: () => "Status", accessorKey: "status", enableSorting: false },
+  {
+    header: "Status",
+    accessorKey: "status",
+    cell: (info: CellContext<Rent, any>) => {
+      const status = info.getValue();
+      return getStatusIndicator(status);
+    },
+    enableSorting: false,
+    class: "bg-red",
+  },
 ]);
 const table = useVueTable({
   data: mockVehicles.value,
@@ -68,17 +91,36 @@ const table = useVueTable({
     },
   },
 });
+function getStatusIndicator(status: string) {
+  const colorMap: Record<string, string> = {
+    rented: "bg-blue-500",
+    available: "bg-green-500",
+    maintenence: "bg-orange-500",
+  };
+
+  const labelMap: Record<string, string> = {
+    rented: "Rented",
+    available: "Available",
+    maintenence: "Maintenance",
+  };
+
+  const dotClass = `w-2 h-2 rounded-full ${colorMap[status] ?? "bg-gray-400"}`;
+
+  return h("div", { class: "flex items-center gap-2 ml-4" }, [
+    h("span", { class: dotClass }),
+    // h("span", { class: "text-sm text-gray-700" }, labelMap[status] ?? status),
+  ]);
+}
 </script>
 <template>
   <main class="flex flex-col items-center w-full">
-    <div class="flex justify-between items-center w-[90%]">
-      <div class="">
+    <div class="flex justify-between items-center w-[90%] mb-4">
+      <div>
         <h1 class="text-2xl font-bold">Vehicles</h1>
-        <p class="text-md font-light text-gray-600">
+        <p class="text-sm font-light text-gray-600">
           Manage your vehicle fleet
         </p>
       </div>
-
       <div class="flex gap-2">
         <Button variant="secondary" class="cursor-pointer"
           ><Download></Download>Export</Button
@@ -88,7 +130,7 @@ const table = useVueTable({
         >
       </div>
     </div>
-    <div class="flex gap-4 mt-4 flex-wrap self-start ml-[5%]">
+    <div class="flex gap-4 flex-wrap self-start ml-[5%]">
       <div
         class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
       >

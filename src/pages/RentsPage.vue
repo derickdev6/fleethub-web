@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { h } from "vue";
 import {
   DataTable,
   DataTableBody,
@@ -10,7 +11,6 @@ import {
 } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { Plus, Download } from "lucide-vue-next";
-import rents from "@/store/mock/rents.json";
 import { ref } from "vue";
 import {
   useVueTable,
@@ -19,38 +19,83 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   FlexRender,
+  ColumnDef,
 } from "@tanstack/vue-table";
+import rents from "@/store/mock/rents.json";
 
 const mockRents = ref(rents);
-const columns = ref([
-  { header: () => "Vehicle", accessorKey: "vehicle", enableSorting: false },
-  {
-    header: () => "Vehicle ID",
-    accessorKey: "vehicleId",
-    enableSorting: false,
-  },
+interface Rent {
+  vehicle: string;
+  vehicleId: string;
+  clientName: string;
+  startDate: string;
+  endDate: string;
+  type: string;
+  paymentFrequency: string;
+  payment: number;
+  paymentBonus: number;
+  totalPrice: number;
+  status: string;
+}
+const columns: ColumnDef<Rent, any>[] = [
+  { header: "Vehicle", accessorKey: "vehicle", enableSorting: false },
+  { header: "Plate", accessorKey: "vehicleId", enableSorting: false },
   { header: "Customer", accessorKey: "clientName", enableSorting: false },
   {
-    header: () => "Start Date",
+    header: "Start Date",
     accessorKey: "startDate",
-    sortingFn: "datetime",
+    sortingFn: (rowA, rowB, columnId) => {
+      const a = new Date(rowA.getValue(columnId)).getTime();
+      const b = new Date(rowB.getValue(columnId)).getTime();
+      return a - b;
+    },
+    cell: (info: any) => new Date(info.getValue()).toLocaleDateString(),
   },
-  { header: () => "End Date", accessorKey: "endDate", sortingFn: "datetime" },
-  { header: "Type", accessorKey: "type", enableSorting: false },
+  {
+    header: "End Date",
+    accessorKey: "endDate",
+    sortingFn: (rowA, rowB, columnId) => {
+      const a = new Date(rowA.getValue(columnId)).getTime();
+      const b = new Date(rowB.getValue(columnId)).getTime();
+      return a - b;
+    },
+    cell: (info: any) => new Date(info.getValue()).toLocaleDateString(),
+  },
+  // { header: "Type", accessorKey: "type", enableSorting: false },
   {
     header: "Frequency",
     accessorKey: "paymentFrequency",
     enableSorting: false,
   },
-  { header: "Payment", accessorKey: "payment" },
-  { header: "Bonus", accessorKey: "paymentBonus" },
-  { header: "Total", accessorKey: "totalPrice" },
-  { header: "Status", accessorKey: "status", enableSorting: false },
-]);
+  {
+    header: "Payment",
+    accessorKey: "payment",
+    cell: (info: any) => `$${info.getValue().toFixed(2)}`,
+  },
+  {
+    header: "Bonus",
+    accessorKey: "paymentBonus",
+    cell: (info: any) => `$${info.getValue().toFixed(2)}`,
+  },
+  {
+    header: "Total",
+    accessorKey: "totalPrice",
+    cell: (info: any) => `$${info.getValue().toFixed(2)}`,
+  },
+  {
+    header: "Status",
+    accessorKey: "status",
+    cell: (info: any) => {
+      const status = info.getValue();
+      return getStatusIndicator(status);
+    },
+    enableSorting: false,
+  },
+];
 
 const table = useVueTable({
   data: mockRents.value,
-  columns: columns.value,
+  columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
@@ -61,28 +106,45 @@ const table = useVueTable({
     },
   },
 });
+
+function getStatusIndicator(status: string) {
+  const colorMap: Record<string, string> = {
+    active: "bg-blue-500",
+    completed: "bg-green-500",
+    cancelled: "bg-red-500",
+  };
+
+  const labelMap: Record<string, string> = {
+    active: "Active",
+    completed: "Completed",
+    cancelled: "Cancelled",
+  };
+
+  const dotClass = `w-2 h-2 rounded-full ${colorMap[status] ?? "bg-gray-400"}`;
+
+  return h("div", { class: "flex items-center gap-2 ml-4" }, [
+    h("span", { class: dotClass }),
+    // h("span", { class: "text-sm text-gray-700" }, labelMap[status] ?? status),
+  ]);
+}
 </script>
 
 <template>
   <main class="flex flex-col items-center w-full">
-    <div class="flex justify-between items-center w-[90%]">
-      <div class="">
+    <div class="flex justify-between items-center w-[90%] mb-4">
+      <div>
         <h1 class="text-2xl font-bold">Rents</h1>
-        <p class="text-md font-light text-gray-600">
+        <p class="text-sm font-light text-gray-600">
           Manage rents and bookings
         </p>
       </div>
-
       <div class="flex gap-2">
-        <Button variant="secondary" class="cursor-pointer"
-          ><Download></Download>Export</Button
-        >
-        <Button variant="outline" class="cursor-pointer"
-          ><Plus></Plus> New rent</Button
-        >
+        <Button variant="secondary"><Download />Export</Button>
+        <Button variant="outline"><Plus />New rent</Button>
       </div>
     </div>
-    <div class="flex gap-4 mt-4 flex-wrap self-start ml-[5%]">
+
+    <div class="flex gap-4 flex-wrap self-start ml-[5%]">
       <div
         class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
       >
@@ -102,61 +164,60 @@ const table = useVueTable({
         <span class="text-xs text-gray-500 font-light">Cancelled</span>
       </div>
     </div>
-    <section class="flex flex-wrap gap-4 w-[90%]">
-      <div class="flex-grow">
-        <DataTablePagination :table="table" class="mt-4" />
 
-        <DataTable>
-          <DataTableHeader>
-            <DataTableRow
-              v-for="headerGroup in table.getHeaderGroups()"
-              :key="headerGroup.id"
+    <section class="w-[90%]">
+      <DataTablePagination :table="table" class="mb-4" />
+
+      <DataTable>
+        <DataTableHeader>
+          <DataTableRow
+            v-for="headerGroup in table.getHeaderGroups()"
+            :key="headerGroup.id"
+          >
+            <DataTableHeaderCell
+              v-for="header in headerGroup.headers"
+              :key="header.id"
+              :header="header"
             >
-              <DataTableHeaderCell
-                v-for="header in headerGroup.headers"
-                :key="header.id"
-                :header="header"
+              <FlexRender
+                :render="header.column.columnDef.header"
+                :props="header.getContext()"
+              />
+            </DataTableHeaderCell>
+          </DataTableRow>
+        </DataTableHeader>
+
+        <DataTableBody>
+          <template v-if="table.getRowModel().rows.length">
+            <DataTableRow
+              v-for="row in table.getRowModel().rows"
+              :key="row.id"
+              class="cursor-pointer hover:bg-muted transition-colors duration-150"
+            >
+              <DataTableCell
+                v-for="cell in row.getVisibleCells()"
+                :key="cell.id"
+                class="whitespace-nowrap"
               >
                 <FlexRender
-                  :render="header.column.columnDef.header"
-                  :props="header.getContext()"
+                  :render="cell.column.columnDef.cell"
+                  :props="cell.getContext()"
                 />
-              </DataTableHeaderCell>
+              </DataTableCell>
             </DataTableRow>
-          </DataTableHeader>
-
-          <DataTableBody>
-            <template v-if="table.getRowModel().rows.length">
-              <DataTableRow
-                v-for="row in table.getRowModel().rows"
-                :key="row.id"
-                class="hover:bg-muted cursor-pointer"
+          </template>
+          <template v-else>
+            <DataTableRow>
+              <DataTableCell
+                class="text-center text-muted-foreground"
+                :colspan="columns.length"
               >
-                <DataTableCell
-                  v-for="cell in row.getVisibleCells()"
-                  :key="cell.id"
-                  class="whitespace-nowrap"
-                >
-                  <FlexRender
-                    :render="cell.column.columnDef.cell"
-                    :props="cell.getContext()"
-                  />
-                </DataTableCell>
-              </DataTableRow>
-            </template>
-            <template v-else>
-              <DataTableRow>
-                <DataTableCell
-                  class="text-center text-muted-foreground"
-                  :colspan="columns.length"
-                >
-                  No results.
-                </DataTableCell>
-              </DataTableRow>
-            </template>
-          </DataTableBody>
-        </DataTable>
-      </div>
+                No results.
+              </DataTableCell>
+            </DataTableRow>
+          </template>
+        </DataTableBody>
+      </DataTable>
     </section>
   </main>
 </template>

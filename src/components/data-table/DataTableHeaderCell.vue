@@ -1,19 +1,26 @@
 <script setup lang="ts">
-defineProps<{
-  header: any;
+import type { Header } from "@tanstack/vue-table";
+
+const props = defineProps<{
+  header: Header<any, unknown>;
 }>();
+
+const sortingIndicator = () => {
+  const sorted = props.header.column.getIsSorted();
+  if (sorted === "asc") return " ↑";
+  if (sorted === "desc") return " ↓";
+  return "";
+};
 </script>
 
 <template>
   <th
     scope="col"
     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-    :class="{
-      'cursor-pointer select-none': header.column.getCanSort(),
-    }"
+    :class="{ 'cursor-pointer select-none': header.column.getCanSort() }"
     @click="header.column.getToggleSortingHandler()?.($event)"
   >
     <slot />
-    {{ { asc: " ↑", desc: " ↓" }[header.column.getIsSorted()] }}
+    <span>{{ sortingIndicator() }}</span>
   </th>
 </template>
