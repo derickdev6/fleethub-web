@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { h, ref } from "vue";
-import { RouterLink } from "vue-router";
-import vehicles from "@/store/mock/vehicles.json";
-import { Warehouse } from "lucide-vue-next";
+// import { RouterLink } from "vue-router";
+import services from "@/store/mock/services.json";
+import { Wrench } from "lucide-vue-next";
 
 import {
   useVueTable,
@@ -30,38 +30,36 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
+  // CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 
-interface Vehicle {
-  brand: string;
-  model: string;
-  plate_number: string;
+interface Service {
+  id: number;
+  type: string;
+  description: string;
+  vehiclePlate: string;
+  date: string;
+  price: number;
+  address: string;
   status: string;
-  image?: string | null;
-  acquired_date: string;
-  fuel_type: string;
-  cylinder_capacity: number;
-  tire_size: string;
 }
 
-const mockVehicles = ref<Vehicle[]>(vehicles);
-const selectedVehicle = ref<Vehicle | null>(null);
+const mockServices = ref<Service[]>(services);
+const selectedService = ref<Service | null>(null);
 
-const selectVehicle = (vehicle: Vehicle) => {
-  selectedVehicle.value =
-    selectedVehicle.value?.plate_number === vehicle.plate_number
-      ? null
-      : vehicle;
+const selectService = (service: Service) => {
+  selectedService.value =
+    selectedService.value?.id === service.id ? null : service;
 };
 
 function getStatusIndicator(status: string) {
   const colorMap: Record<string, string> = {
-    rented: "bg-blue-500",
-    available: "bg-green-500",
-    maintenence: "bg-orange-500",
+    active: "bg-blue-500",
+    completed: "bg-green-500",
+    upcoming: "bg-yellow-500",
+    cancelled: "bg-orange-500",
   };
 
   const dotClass = `w-2 h-2 rounded-full ${colorMap[status] ?? "bg-gray-400"}`;
@@ -71,24 +69,51 @@ function getStatusIndicator(status: string) {
 }
 
 const columns = ref([
-  { header: "Brand", accessorKey: "brand" },
-  { header: "Model", accessorKey: "model" },
+  // {
+  //   accessorKey: "description",
+  //   header: "Description",
+  //   cell: (info: CellContext<Service, string>) => info.getValue(),
+  // },
   {
-    header: "Plate Number",
-    accessorKey: "plate_number",
+    accessorKey: "vehiclePlate",
+    header: "Vehicle Plate",
+    cell: (info: CellContext<Service, string>) => info.getValue(),
     enableSorting: false,
   },
   {
-    header: "Status",
+    accessorKey: "date",
+    header: "Date",
+    cell: (info: CellContext<Service, string>) => info.getValue(),
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+    cell: (info: CellContext<Service, string>) => info.getValue(),
+    enableSorting: false,
+  },
+
+  {
+    accessorKey: "price",
+    header: "Price",
+    cell: (info: CellContext<Service, number>) => `$${info.getValue()}`,
+  },
+  {
+    accessorKey: "address",
+    header: "Address",
+    cell: (info: CellContext<Service, string>) => info.getValue(),
+    enableSorting: false,
+  },
+  {
     accessorKey: "status",
-    cell: (info: CellContext<Vehicle, any>) =>
+    header: "Status",
+    cell: (info: CellContext<Service, string>) =>
       getStatusIndicator(info.getValue()),
     enableSorting: false,
   },
 ]);
 
 const table = useVueTable({
-  data: mockVehicles.value,
+  data: mockServices.value,
   columns: columns.value,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -103,12 +128,12 @@ const table = useVueTable({
     <div class="flex justify-between items-center w-[90%] mb-4">
       <div class="flex items-center gap-4">
         <div class="border-2 border-black rounded-full p-2">
-          <Warehouse class="h-8 w-8" />
+          <Wrench class="h-8 w-8" />
         </div>
         <div>
-          <h1 class="text-2xl font-bold">Vehicles</h1>
+          <h1 class="text-2xl font-bold">Maintenence</h1>
           <p class="text-sm font-light text-gray-600">
-            Manage your vehicle fleet
+            Manage your fleet services and maintenance
           </p>
         </div>
       </div>
@@ -117,7 +142,7 @@ const table = useVueTable({
           <Download /> Export
         </Button>
         <Button variant="outline" class="cursor-pointer">
-          <Plus /> New vehicle
+          <Plus /> New service
         </Button>
       </div>
     </div>
@@ -127,19 +152,19 @@ const table = useVueTable({
         class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
       >
         <p class="text-lg font-semibold text-blue-500">3</p>
-        <span class="text-xs text-gray-500 font-light">Rented</span>
+        <span class="text-xs text-gray-500 font-light">Active</span>
       </div>
       <div
         class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
       >
-        <p class="text-lg font-semibold text-green-500">5</p>
-        <span class="text-xs text-gray-500 font-light">Available</span>
+        <p class="text-lg font-semibold text-yellow-500">5</p>
+        <span class="text-xs text-gray-500 font-light">Upcoming</span>
       </div>
       <div
         class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
       >
-        <p class="text-lg font-semibold text-orange-500">2</p>
-        <span class="text-xs text-gray-500 font-light">Maintenence</span>
+        <p class="text-lg font-semibold text-red-500">2</p>
+        <span class="text-xs text-gray-500 font-light">Cancelled</span>
       </div>
     </div>
 
@@ -175,10 +200,9 @@ const table = useVueTable({
                   class="hover:bg-[var(--cream)]"
                   :class="{
                     'active-background':
-                      selectedVehicle?.plate_number ===
-                      row.original.plate_number,
+                      selectedService?.id === row.original.id,
                   }"
-                  @click="selectVehicle(row.original)"
+                  @click="selectService(row.original)"
                 >
                   <DataTableCell
                     v-for="cell in row.getVisibleCells()"
@@ -207,48 +231,44 @@ const table = useVueTable({
         </div>
       </div>
 
-      <div class="w-[30%]" v-if="selectedVehicle">
+      <div class="w-[30%]" v-if="selectedService">
         <Card
           class="w-full details-card min-w-[300px] max-h-100 max-w-80 sticky top-6"
-          :class="[selectedVehicle.status]"
+          :class="[selectedService.status]"
         >
           <CardHeader>
             <div class="flex items-center justify-center mb-4">
               <div class="rounded-xl flex-grow">
                 <CardTitle
-                  >{{ selectedVehicle.brand }}
-                  {{ selectedVehicle.model }}</CardTitle
+                  >{{ selectedService.id }} -
+                  {{ selectedService.vehiclePlate }}</CardTitle
                 >
                 <CardDescription
-                  >Placa: {{ selectedVehicle.plate_number }}</CardDescription
+                  >Tipo: {{ selectedService.type }}</CardDescription
                 >
               </div>
-              <img
-                :src="selectedVehicle.image || '/images/scooter.png'"
+              <!-- <img
+                :src="selectedService.image || '/images/scooter.png'"
                 alt="Vehicle Image"
                 class="w-24 h-24 mx-auto rounded-xl"
-              />
+              /> -->
             </div>
           </CardHeader>
 
           <CardContent class="space-y-1 text-sm flex-grow flex flex-col">
-            <p><strong>Estado:</strong> {{ selectedVehicle.status }}</p>
+            <p><strong>Estado:</strong> {{ selectedService.status }}</p>
+            <p><strong>Fecha:</strong> {{ selectedService.date }}</p>
+            <p><strong>Precio:</strong> {{ selectedService.price }}</p>
             <p>
-              <strong>Adquirido:</strong> {{ selectedVehicle.acquired_date }}
+              <strong>Descripcion:</strong> {{ selectedService.description }}
             </p>
-            <p><strong>Combustible:</strong> {{ selectedVehicle.fuel_type }}</p>
-            <p>
-              <strong>Cilindraje:</strong>
-              {{ selectedVehicle.cylinder_capacity }} cc
-            </p>
-            <p><strong>Llantas:</strong> {{ selectedVehicle.tire_size }}</p>
           </CardContent>
 
-          <CardFooter class="flex flex-wrap justify-center gap-2">
+          <!-- <CardFooter class="flex flex-wrap justify-center gap-2">
             <RouterLink
               :to="{
                 name: 'vehicle-details',
-                params: { plate: selectedVehicle.plate_number },
+                params: { plate: selectedService.plate_number },
               }"
               class="w-[48%]"
             >
@@ -259,7 +279,7 @@ const table = useVueTable({
             <Button variant="outline" class="w-[48%]">Rent</Button>
             <Button variant="outline" class="w-[48%]">Maintenance</Button>
             <Button variant="outline" class="w-[48%]">Event</Button>
-          </CardFooter>
+          </CardFooter> -->
         </Card>
       </div>
     </section>
@@ -270,13 +290,16 @@ const table = useVueTable({
 .details-card {
   box-shadow: 0 0 10px #22222266;
 }
-.details-card.available {
+.details-card.completed {
   box-shadow: 0 0 10px #4caf5066;
 }
-.details-card.rented {
+.details-card.active {
   box-shadow: 0 0 10px #2196f366;
 }
-.details-card.maintenance {
+.details-card.upcoming {
   box-shadow: 0 0 10px #ff980066;
+}
+.details-card.cancelled {
+  box-shadow: 0 0 10px #f4433666;
 }
 </style>

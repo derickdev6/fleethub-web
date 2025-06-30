@@ -6,7 +6,7 @@ import {
   Settings,
   Users,
   Wrench,
-  Boxes,
+  // Boxes,
   Warehouse,
 } from "lucide-vue-next";
 import {
@@ -47,11 +47,11 @@ const items = [
     url: "/events",
     icon: ClipboardPlus,
   },
-  {
-    title: "Inventory",
-    url: "/inventory",
-    icon: Boxes,
-  },
+  // {
+  //   title: "Inventory",
+  //   url: "/inventory",
+  //   icon: Boxes,
+  // },
   {
     title: "Clients",
     url: "/clients",

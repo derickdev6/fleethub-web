@@ -16,6 +16,12 @@ const routes = [
     component: () => import('@/pages/RentsPage.vue'),
   },
   {
+    path: '/maintenance',
+    name: 'maintenance',
+    component: () => import('@/pages/MaintenancePage.vue'),
+  },
+
+  {
     path: '/events',
     name: 'events',
     component: () => import('@/pages/EventsPage.vue'),

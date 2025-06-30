@@ -1,6 +1,7 @@
 // RentsPage.vue
 <script setup lang="ts">
 import { h } from "vue";
+import { MapPinPlus } from "lucide-vue-next";
 import {
   DataTable,
   DataTableBody,
@@ -118,11 +119,16 @@ function getStatusIndicator(status: string) {
 <template>
   <main class="flex flex-col items-center w-full">
     <div class="flex justify-between items-center w-[90%] mb-4">
-      <div>
-        <h1 class="text-2xl font-bold">Rents</h1>
-        <p class="text-sm font-light text-gray-600">
-          Manage rents and bookings
-        </p>
+      <div class="flex items-center gap-4">
+        <div class="border-2 border-black rounded-full p-2">
+          <MapPinPlus class="h-8 w-8" />
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold">Rents</h1>
+          <p class="text-sm font-light text-gray-600">
+            Manage rents and bookings
+          </p>
+        </div>
       </div>
       <div class="flex gap-2">
         <Button variant="secondary"><Download />Export</Button>
@@ -153,7 +159,7 @@ function getStatusIndicator(status: string) {
 
     <section class="w-[90%]">
       <DataTablePagination :table="table" class="mb-4" />
-      <div class="overflow-y-scroll max-h-[500px]">
+      <div class="overflow-y-scroll max-h-[90vh] shadow-lg rounded-xl">
         <DataTable>
           <DataTableHeader>
             <DataTableRow
