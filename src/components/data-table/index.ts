@@ -5,3 +5,4 @@ export { default as DataTableHeader } from "./DataTableHeader.vue";
 export { default as DataTableHeaderCell } from "./DataTableHeaderCell.vue";
 export { default as DataTableRow } from "./DataTableRow.vue";
 export { default as DataTablePagination } from "./DataTablePagination.vue";
+export { default as DataTablePageSize } from "./DataTablePageSize.vue";

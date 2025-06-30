@@ -1,7 +1,7 @@
 <template>
   <tr
     data-slot="table-row"
-    class="border-b transition-colors hover:bg-white data-[state=selected]:bg-muted"
+    class="border-b cursor-pointer transition-colors duration-150"
   >
     <slot />
   </tr>

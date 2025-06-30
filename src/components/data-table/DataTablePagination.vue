@@ -6,7 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-vue-next";
-
+import { DataTablePageSize } from ".";
 const props = defineProps<{
   table: any;
 }>();
@@ -53,20 +53,6 @@ const props = defineProps<{
         {{ props.table.getPageCount() }}
       </p>
     </div>
-    <div class="flex items-center space-x-2">
-      <p class="text-sm text-gray-500">Page Size:</p>
-      <Button
-        class="disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-        @click="table.setPageSize(10)"
-        :disabled="table.pageSize === 10"
-        >10</Button
-      >
-      <Button
-        class="disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-        @click="table.setPageSize(20)"
-        :disabled="table.pageSize === 20"
-        >20</Button
-      >
-    </div>
+    <DataTablePageSize :table="props.table" />
   </div>
 </template>
