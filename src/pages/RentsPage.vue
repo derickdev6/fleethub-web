@@ -153,56 +153,58 @@ function getStatusIndicator(status: string) {
 
     <section class="w-[90%]">
       <DataTablePagination :table="table" class="mb-4" />
-      <DataTable>
-        <DataTableHeader>
-          <DataTableRow
-            v-for="headerGroup in table.getHeaderGroups()"
-            :key="headerGroup.id"
-          >
-            <DataTableHeaderCell
-              v-for="header in headerGroup.headers"
-              :key="header.id"
-              :header="header"
-            >
-              <FlexRender
-                :render="header.column.columnDef.header"
-                :props="header.getContext()"
-              />
-            </DataTableHeaderCell>
-          </DataTableRow>
-        </DataTableHeader>
-
-        <DataTableBody>
-          <template v-if="table.getRowModel().rows.length">
+      <div class="overflow-y-scroll max-h-[500px]">
+        <DataTable>
+          <DataTableHeader>
             <DataTableRow
-              v-for="row in table.getRowModel().rows"
-              :key="row.id"
-              class="cursor-pointer hover:bg-muted transition-colors duration-150"
+              v-for="headerGroup in table.getHeaderGroups()"
+              :key="headerGroup.id"
+              class="sticky top-0 z-10 bg-white"
             >
-              <DataTableCell
-                v-for="cell in row.getVisibleCells()"
-                :key="cell.id"
-                class="whitespace-nowrap"
+              <DataTableHeaderCell
+                v-for="header in headerGroup.headers"
+                :key="header.id"
+                :header="header"
               >
                 <FlexRender
-                  :render="cell.column.columnDef.cell"
-                  :props="cell.getContext()"
+                  :render="header.column.columnDef.header"
+                  :props="header.getContext()"
                 />
-              </DataTableCell>
+              </DataTableHeaderCell>
             </DataTableRow>
-          </template>
-          <template v-else>
-            <DataTableRow>
-              <DataTableCell
-                class="text-center text-muted-foreground"
-                :colspan="table.getAllColumns().length"
+          </DataTableHeader>
+          <DataTableBody>
+            <template v-if="table.getRowModel().rows.length">
+              <DataTableRow
+                v-for="row in table.getRowModel().rows"
+                :key="row.id"
+                class="hover:bg-[var(--cream)]"
               >
-                No results.
-              </DataTableCell>
-            </DataTableRow>
-          </template>
-        </DataTableBody>
-      </DataTable>
+                <DataTableCell
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                  class="whitespace-nowrap"
+                >
+                  <FlexRender
+                    :render="cell.column.columnDef.cell"
+                    :props="cell.getContext()"
+                  />
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+            <template v-else>
+              <DataTableRow>
+                <DataTableCell
+                  class="text-center text-muted-foreground"
+                  :colspan="table.getAllColumns().length"
+                >
+                  No results.
+                </DataTableCell>
+              </DataTableRow>
+            </template>
+          </DataTableBody>
+        </DataTable>
+      </div>
     </section>
   </main>
 </template>

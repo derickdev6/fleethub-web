@@ -139,12 +139,13 @@ const table = useVueTable({
 
     <section class="flex flex-wrap gap-4 w-[90%]">
       <div class="flex-grow">
-        <DataTablePagination :table="table" class="mt-4" />
+        <DataTablePagination :table="table" class="mb-4" />
         <DataTable>
           <DataTableHeader>
             <DataTableRow
               v-for="headerGroup in table.getHeaderGroups()"
               :key="headerGroup.id"
+              class="sticky top-0 z-10 bg-white"
             >
               <DataTableHeaderCell
                 v-for="header in headerGroup.headers"
@@ -164,7 +165,7 @@ const table = useVueTable({
               <DataTableRow
                 v-for="row in table.getRowModel().rows"
                 :key="row.id"
-                class="cursor-pointer hover:bg-muted"
+                class="hover:bg-[var(--cream)]"
                 :class="{
                   'active-background':
                     selectedVehicle?.plate_number === row.original.plate_number,
