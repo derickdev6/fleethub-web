@@ -57,7 +57,7 @@ const columns: ColumnDef<Rent, any>[] = [
         RouterLink,
         {
           to: `/rents/${info.getValue()}`,
-          class: "text-gray-800 font-bold py-2 px-4",
+          class: "text-gray-800 font-bold py-2 pr-6",
         },
         { default: () => info.getValue().toString() }
       ),
