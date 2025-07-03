@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { h } from "vue";
 import { MapPinPlus } from "lucide-vue-next";
+import { RouterLink } from "vue-router";
 import {
   DataTable,
   DataTableBody,
@@ -27,8 +28,9 @@ import {
 import rents from "@/store/mock/rents.json";
 
 interface Rent {
+  id: number;
   vehicle: string;
-  vehicleId: string;
+  plateNumber: string;
   clientName: string;
   startDate: string;
   endDate: string;
@@ -43,12 +45,39 @@ interface Rent {
 const mockRents = ref<Rent[]>(rents);
 
 const columns: ColumnDef<Rent, any>[] = [
-  { header: "Vehicle", accessorKey: "vehicle", enableSorting: false },
-  { header: "Plate", accessorKey: "vehicleId", enableSorting: false },
-  { header: "Customer", accessorKey: "clientName", enableSorting: false },
+  {
+    header: "ID",
+    accessorKey: "id",
+    enableSorting: false,
+    size: 0, // pixels
+    minSize: 60,
+    maxSize: 100,
+    cell: (info: CellContext<Rent, number>) =>
+      h(
+        RouterLink,
+        {
+          to: `/rents/${info.getValue()}`,
+          class: "text-gray-800 font-bold py-2 px-4",
+        },
+        { default: () => info.getValue().toString() }
+      ),
+  },
+  {
+    header: "Plate",
+    accessorKey: "plateNumber",
+    enableSorting: false,
+    size: 100,
+  },
+  {
+    header: "Customer",
+    accessorKey: "clientName",
+    enableSorting: false,
+    size: 180,
+  },
   {
     header: "Start Date",
     accessorKey: "startDate",
+    size: 140,
     sortingFn: (a, b, id) =>
       new Date(a.getValue(id)).getTime() - new Date(b.getValue(id)).getTime(),
     cell: (info: CellContext<Rent, string>) =>
@@ -57,6 +86,7 @@ const columns: ColumnDef<Rent, any>[] = [
   {
     header: "End Date",
     accessorKey: "endDate",
+    size: 140,
     sortingFn: (a, b, id) =>
       new Date(a.getValue(id)).getTime() - new Date(b.getValue(id)).getTime(),
     cell: (info: CellContext<Rent, string>) =>
@@ -65,27 +95,30 @@ const columns: ColumnDef<Rent, any>[] = [
   {
     header: "Frequency",
     accessorKey: "paymentFrequency",
-    enableSorting: false,
+    size: 100,
   },
   {
     header: "Payment",
     accessorKey: "payment",
-    cell: (info: CellContext<Rent, number>) => `$${info.getValue().toFixed(2)}`,
+    size: 100,
+    cell: (info: CellContext<Rent, number>) => `$${info.getValue()}`,
   },
   {
     header: "Bonus",
     accessorKey: "paymentBonus",
-    cell: (info: CellContext<Rent, number>) => `$${info.getValue().toFixed(2)}`,
+    size: 100,
+    cell: (info: CellContext<Rent, number>) => `$${info.getValue()}`,
   },
   {
     header: "Total",
     accessorKey: "totalPrice",
-    cell: (info: CellContext<Rent, number>) => `$${info.getValue().toFixed(2)}`,
+    size: 100,
+    cell: (info: CellContext<Rent, number>) => `$${info.getValue()}`,
   },
   {
     header: "Status",
     accessorKey: "status",
-    enableSorting: false,
+    size: 120,
     cell: (info: CellContext<Rent, string>) =>
       getStatusIndicator(info.getValue()),
   },
@@ -98,7 +131,22 @@ const table = useVueTable({
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
-  initialState: { pagination: { pageSize: 10 } },
+  initialState: {
+    pagination: { pageSize: 10 },
+    columnSizing: {
+      id: 0,
+      plateNumber: 120,
+      clientName: 180,
+      startDate: 140,
+      endDate: 140,
+      paymentFrequency: 100,
+      payment: 100,
+      paymentBonus: 100,
+      totalPrice: 100,
+      status: 120,
+    },
+  },
+  columnResizeMode: "onChange",
 });
 
 function getStatusIndicator(status: string) {
@@ -106,6 +154,7 @@ function getStatusIndicator(status: string) {
     active: "bg-blue-500",
     completed: "bg-green-500",
     cancelled: "bg-red-500",
+    upcoming: "bg-yellow-500",
   };
 
   const dotClass = `w-2 h-2 rounded-full ${colorMap[status] ?? "bg-gray-400"}`;
@@ -169,6 +218,7 @@ function getStatusIndicator(status: string) {
             >
               <DataTableHeaderCell
                 v-for="header in headerGroup.headers"
+                :style="{ width: `${header.getSize()}px` }"
                 :key="header.id"
                 :header="header"
               >
@@ -188,6 +238,7 @@ function getStatusIndicator(status: string) {
               >
                 <DataTableCell
                   v-for="cell in row.getVisibleCells()"
+                  :style="{ width: `${cell.column.getSize()}px` }"
                   :key="cell.id"
                   class="whitespace-nowrap"
                 >
