@@ -1,0 +1,226 @@
+[
+  {
+    "id": 1,
+    "name": "albuterol sulfate",
+    "description": "aliquet maecenas leo odio condimentum id luctus nec molestie sed justo pellentesque viverra pede ac diam cras pellentesque volutpat dui",
+    "price": 723,
+    "date": "8/6/2024",
+    "status": "no_stock"
+  },
+  {
+    "id": 2,
+    "name": "Mountain Cedar",
+    "description": "morbi non lectus aliquam sit amet diam in magna bibendum imperdiet nullam orci pede venenatis non sodales sed tincidunt",
+    "price": 626,
+    "date": "4/10/2025",
+    "status": "no_stock"
+  },
+  {
+    "id": 3,
+    "name": "HYDROGEN PEROXIDE",
+    "description": "justo pellentesque viverra pede ac diam cras pellentesque volutpat dui maecenas tristique est et tempus semper est quam pharetra",
+    "price": 571,
+    "date": "7/9/2024",
+    "status": "available"
+  },
+  {
+    "id": 4,
+    "name": "Indomethacin",
+    "description": "congue eget semper rutrum nulla nunc purus phasellus in felis donec semper sapien a libero nam dui proin",
+    "price": 910,
+    "date": "8/18/2024",
+    "status": "no_stock"
+  },
+  {
+    "id": 5,
+    "name": "Milrinone Lactate",
+    "description": "in sagittis dui vel nisl duis ac nibh fusce lacus purus aliquet",
+    "price": 179,
+    "date": "12/17/2024",
+    "status": "no_stock"
+  },
+  {
+    "id": 6,
+    "name": "Menthol",
+    "description": "blandit lacinia erat vestibulum sed magna at nunc commodo placerat praesent blandit nam nulla integer pede justo lacinia eget tincidunt",
+    "price": 793,
+    "date": "9/16/2024",
+    "status": "no_stock"
+  },
+  {
+    "id": 7,
+    "name": "Phenol",
+    "description": "cubilia curae mauris viverra diam vitae quam suspendisse potenti nullam porttitor lacus at turpis donec posuere metus vitae ipsum",
+    "price": 606,
+    "date": "2/8/2025",
+    "status": "requested"
+  },
+  {
+    "id": 8,
+    "name": "risperidone",
+    "description": "id ornare imperdiet sapien urna pretium nisl ut volutpat sapien arcu sed",
+    "price": 609,
+    "date": "4/21/2025",
+    "status": "requested"
+  },
+  {
+    "id": 9,
+    "name": "OATMEAL and Menthol",
+    "description": "interdum eu tincidunt in leo maecenas pulvinar lobortis est phasellus sit amet erat nulla tempus vivamus in felis eu",
+    "price": 690,
+    "date": "3/11/2025",
+    "status": "requested"
+  },
+  {
+    "id": 10,
+    "name": "Galantamine",
+    "description": "in tempor turpis nec euismod scelerisque quam turpis adipiscing lorem vitae mattis nibh ligula",
+    "price": 277,
+    "date": "6/4/2025",
+    "status": "available"
+  },
+  {
+    "id": 11,
+    "name": "Methocarbamol",
+    "description": "pede posuere nonummy integer non velit donec diam neque vestibulum eget vulputate ut ultrices vel",
+    "price": 227,
+    "date": "7/1/2025",
+    "status": "available"
+  },
+  {
+    "id": 12,
+    "name": "Acetaminophen",
+    "description": "pellentesque ultrices phasellus id sapien in sapien iaculis congue vivamus metus arcu adipiscing molestie hendrerit at vulputate vitae nisl aenean",
+    "price": 631,
+    "date": "11/5/2024",
+    "status": "requested"
+  },
+  {
+    "id": 13,
+    "name": "ALENDRONATE SODIUM",
+    "description": "elit proin risus praesent lectus vestibulum quam sapien varius ut blandit non interdum",
+    "price": 739,
+    "date": "4/9/2025",
+    "status": "available"
+  },
+  {
+    "id": 14,
+    "name": "Gabapentin",
+    "description": "volutpat erat quisque erat eros viverra eget congue eget semper rutrum nulla nunc purus phasellus in",
+    "price": 189,
+    "date": "6/2/2025",
+    "status": "no_stock"
+  },
+  {
+    "id": 15,
+    "name": "GLYCERIN",
+    "description": "ac nulla sed vel enim sit amet nunc viverra dapibus nulla suscipit ligula in",
+    "price": 138,
+    "date": "2/17/2025",
+    "status": "no_stock"
+  },
+  {
+    "id": 16,
+    "name": "METHYLPREDNISOLONE",
+    "description": "sapien quis libero nullam sit amet turpis elementum ligula vehicula consequat morbi a ipsum integer a nibh",
+    "price": 280,
+    "date": "9/18/2024",
+    "status": "available"
+  },
+  {
+    "id": 17,
+    "name": "AVOBENZONE, HOMOSALATE, OCTOCRYLENE",
+    "description": "mattis egestas metus aenean fermentum donec ut mauris eget massa",
+    "price": 770,
+    "date": "10/20/2024",
+    "status": "no_stock"
+  },
+  {
+    "id": 18,
+    "name": "CICLOPIROX OLAMINE",
+    "description": "bibendum morbi non quam nec dui luctus rutrum nulla tellus in sagittis dui vel nisl duis ac nibh fusce",
+    "price": 773,
+    "date": "11/24/2024",
+    "status": "available"
+  },
+  {
+    "id": 19,
+    "name": "Nisoldipine",
+    "description": "ut mauris eget massa tempor convallis nulla neque libero convallis eget eleifend luctus ultricies eu",
+    "price": 320,
+    "date": "5/11/2025",
+    "status": "requested"
+  },
+  {
+    "id": 20,
+    "name": "Beech, American Fagus grandifolia",
+    "description": "aenean auctor gravida sem praesent id massa id nisl venenatis lacinia aenean sit",
+    "price": 879,
+    "date": "8/29/2024",
+    "status": "available"
+  },
+  {
+    "id": 21,
+    "name": "Avobenzone, Octinoxate, Octisalate, Octocrylene",
+    "description": "morbi ut odio cras mi pede malesuada in imperdiet et commodo vulputate justo in blandit",
+    "price": 610,
+    "date": "9/1/2024",
+    "status": "available"
+  },
+  {
+    "id": 22,
+    "name": "Trandolapril",
+    "description": "nulla nisl nunc nisl duis bibendum felis sed interdum venenatis",
+    "price": 890,
+    "date": "12/23/2024",
+    "status": "available"
+  },
+  {
+    "id": 23,
+    "name": "Benzoyl Peroxide",
+    "description": "aenean auctor gravida sem praesent id massa id nisl venenatis lacinia aenean sit amet justo morbi ut odio cras mi",
+    "price": 903,
+    "date": "9/18/2024",
+    "status": "available"
+  },
+  {
+    "id": 24,
+    "name": "Meropenem",
+    "description": "eget massa tempor convallis nulla neque libero convallis eget eleifend luctus ultricies",
+    "price": 432,
+    "date": "12/17/2024",
+    "status": "available"
+  },
+  {
+    "id": 25,
+    "name": "ethanol",
+    "description": "dolor morbi vel lectus in quam fringilla rhoncus mauris enim leo",
+    "price": 817,
+    "date": "9/3/2024",
+    "status": "requested"
+  },
+  {
+    "id": 26,
+    "name": "Asenapine Maleate",
+    "description": "tincidunt eu felis fusce posuere felis sed lacus morbi sem mauris laoreet",
+    "price": 157,
+    "date": "3/23/2025",
+    "status": "no_stock"
+  },
+  {
+    "id": 27,
+    "name": "Tizanidine",
+    "description": "sed accumsan felis ut at dolor quis odio consequat varius integer ac leo pellentesque ultrices",
+    "price": 419,
+    "date": "6/5/2025",
+    "status": "available"
+  },
+  {
+    "id": 28,
+    "name": "peginterferon alfa-2a",
+    "description": "dis parturient montes nascetur ridiculus mus vivamus vestibulum sagittis sapien cum sociis natoque",
+    "price": 448,
+    "date": "11/25/2024",
+    "status": "requested"
+  }
+]

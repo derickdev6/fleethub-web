@@ -2,7 +2,8 @@
 import { h, ref } from "vue";
 // import { RouterLink } from "vue-router";
 import services from "@/store/mock/services.json";
-import { Wrench } from "lucide-vue-next";
+import inventory from "@/store/mock/inventory.json";
+import { Boxes, Wrench } from "lucide-vue-next";
 
 import {
   useVueTable,
@@ -46,12 +47,27 @@ interface Service {
   status: string;
 }
 
+interface InventoryItem {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  date: string;
+  status: string;
+}
+
 const mockServices = ref<Service[]>(services);
 const selectedService = ref<Service | null>(null);
+const mockInventory = ref<InventoryItem[]>(inventory);
+const selectedInventoryItem = ref<InventoryItem | null>(null);
 
 const selectService = (service: Service) => {
   selectedService.value =
     selectedService.value?.id === service.id ? null : service;
+};
+const selectInventoryItem = (item: InventoryItem) => {
+  selectedInventoryItem.value =
+    selectedInventoryItem.value?.id === item.id ? null : item;
 };
 
 function getStatusIndicator(status: string) {
@@ -60,6 +76,9 @@ function getStatusIndicator(status: string) {
     completed: "bg-green-500",
     upcoming: "bg-yellow-500",
     cancelled: "bg-orange-500",
+    available: "bg-green-500",
+    no_stock: "bg-red-500",
+    requested: "bg-yellow-500",
   };
 
   const dotClass = `w-2 h-2 rounded-full ${colorMap[status] ?? "bg-gray-400"}`;
@@ -68,7 +87,7 @@ function getStatusIndicator(status: string) {
   ]);
 }
 
-const columns = ref([
+const columnsMaintenence = ref([
   // {
   //   accessorKey: "description",
   //   header: "Description",
@@ -114,7 +133,45 @@ const columns = ref([
 
 const table = useVueTable({
   data: mockServices.value,
-  columns: columns.value,
+  columns: columnsMaintenence.value,
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  initialState: { pagination: { pageSize: 10 } },
+});
+
+const columnsInventory = ref([
+  {
+    accessorKey: "name",
+    header: "Name",
+    cell: (info: CellContext<InventoryItem, string>) => info.getValue(),
+  },
+  // {
+  //   accessorKey: "description",
+  //   header: "Description",
+  //   cell: (info: CellContext<InventoryItem, string>) => info.getValue(),
+  // },
+  {
+    accessorKey: "price",
+    header: "Price",
+    cell: (info: CellContext<InventoryItem, number>) => `$${info.getValue()}`,
+  },
+  {
+    accessorKey: "date",
+    header: "Date",
+    cell: (info: CellContext<InventoryItem, string>) => info.getValue(),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: (info: CellContext<InventoryItem, string>) =>
+      getStatusIndicator(info.getValue()),
+  },
+]);
+const inventoryTable = useVueTable({
+  data: mockInventory.value,
+  columns: columnsInventory.value,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
@@ -149,29 +206,29 @@ const table = useVueTable({
 
     <div class="flex gap-4 flex-wrap self-start ml-[5%]">
       <div
-        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
+        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white"
       >
         <p class="text-lg font-semibold text-blue-500">3</p>
         <span class="text-xs text-gray-500 font-light">Active</span>
       </div>
       <div
-        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
+        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white"
       >
         <p class="text-lg font-semibold text-yellow-500">5</p>
         <span class="text-xs text-gray-500 font-light">Upcoming</span>
       </div>
       <div
-        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white flex-1"
+        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white"
       >
         <p class="text-lg font-semibold text-red-500">2</p>
         <span class="text-xs text-gray-500 font-light">Cancelled</span>
       </div>
     </div>
 
-    <section class="flex flex-wrap gap-4 w-[90%] items-center">
+    <section class="flex flex-wrap gap-4 w-[90%] items-center mb-12">
       <div class="flex-grow">
         <DataTablePagination :table="table" class="mb-4" />
-        <div class="overflow-y-scroll max-h-[90vh] shadow-lg rounded-xl">
+        <div class="overflow-y-auto max-h-[90vh] shadow-lg rounded-xl">
           <DataTable>
             <DataTableHeader>
               <DataTableRow
@@ -220,7 +277,7 @@ const table = useVueTable({
                 <DataTableRow>
                   <DataTableCell
                     class="text-center text-muted-foreground"
-                    :colspan="columns.length"
+                    :colspan="columnsMaintenence.length"
                   >
                     No results.
                   </DataTableCell>
@@ -283,6 +340,158 @@ const table = useVueTable({
         </Card>
       </div>
     </section>
+    <div class="flex justify-between items-center w-[90%] mb-4">
+      <div class="flex items-center gap-4">
+        <div class="border-2 border-black rounded-full p-2">
+          <Boxes class="h-8 w-8" />
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold">Inventory</h1>
+          <p class="text-sm font-light text-gray-600">
+            Manage your inventory and stock
+          </p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <Button variant="outline" class="cursor-pointer">
+          <Plus /> New item
+        </Button>
+      </div>
+    </div>
+
+    <div class="flex gap-4 flex-wrap self-start ml-[5%]">
+      <div
+        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white"
+      >
+        <p class="text-lg font-semibold text-green-500">3</p>
+        <span class="text-xs text-gray-500 font-light">Available</span>
+      </div>
+      <div
+        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white"
+      >
+        <p class="text-lg font-semibold text-red-500">5</p>
+        <span class="text-xs text-gray-500 font-light">No Stock</span>
+      </div>
+      <div
+        class="flex flex-col justify-center items-center p-2 border rounded-lg bg-white"
+      >
+        <p class="text-lg font-semibold text-yellow-500">2</p>
+        <span class="text-xs text-gray-500 font-light">Requested</span>
+      </div>
+    </div>
+    <section class="flex flex-wrap gap-4 w-[90%] items-center mb-12">
+      <div class="flex-grow">
+        <DataTablePagination :table="inventoryTable" class="mb-4" />
+        <div class="overflow-y-auto max-h-[90vh] shadow-lg rounded-xl">
+          <DataTable>
+            <DataTableHeader>
+              <DataTableRow
+                v-for="headerGroup in inventoryTable.getHeaderGroups()"
+                :key="headerGroup.id"
+                class="sticky top-0 z-10 bg-white"
+              >
+                <DataTableHeaderCell
+                  v-for="header in headerGroup.headers"
+                  :key="header.id"
+                  :header="header"
+                >
+                  <FlexRender
+                    :render="header.column.columnDef.header"
+                    :props="header.getContext()"
+                  />
+                </DataTableHeaderCell>
+              </DataTableRow>
+            </DataTableHeader>
+
+            <DataTableBody>
+              <template v-if="inventoryTable.getRowModel().rows.length">
+                <DataTableRow
+                  v-for="row in inventoryTable.getRowModel().rows"
+                  :key="row.id"
+                  class="hover:bg-[var(--cream)]"
+                  :class="{
+                    'active-background':
+                      selectedService?.id === row.original.id,
+                  }"
+                  @click="selectInventoryItem(row.original)"
+                >
+                  <DataTableCell
+                    v-for="cell in row.getVisibleCells()"
+                    :key="cell.id"
+                    class="whitespace-nowrap"
+                  >
+                    <FlexRender
+                      :render="cell.column.columnDef.cell"
+                      :props="cell.getContext()"
+                    />
+                  </DataTableCell>
+                </DataTableRow>
+              </template>
+              <template v-else>
+                <DataTableRow>
+                  <DataTableCell
+                    class="text-center text-muted-foreground"
+                    :colspan="columnsInventory.length"
+                  >
+                    No results.
+                  </DataTableCell>
+                </DataTableRow>
+              </template>
+            </DataTableBody>
+          </DataTable>
+        </div>
+      </div>
+
+      <div class="w-[30%]" v-if="selectedInventoryItem">
+        <Card
+          class="w-full details-card min-w-[300px] max-h-100 max-w-80 sticky top-6"
+          :class="[selectedInventoryItem.status]"
+        >
+          <CardHeader>
+            <div class="flex items-center justify-center mb-4">
+              <div class="rounded-xl flex-grow">
+                <CardTitle
+                  >{{ selectedInventoryItem.id }} -
+                  {{ selectedInventoryItem.name }}</CardTitle
+                >
+              </div>
+              <!-- <img
+                :src="selectedService.image || '/images/scooter.png'"
+                alt="Vehicle Image"
+                class="w-24 h-24 mx-auto rounded-xl"
+              /> -->
+            </div>
+          </CardHeader>
+
+          <CardContent class="space-y-1 text-sm flex-grow flex flex-col">
+            <p><strong>Estado:</strong> {{ selectedInventoryItem.status }}</p>
+            <p><strong>Fecha:</strong> {{ selectedInventoryItem.date }}</p>
+            <p><strong>Precio:</strong> {{ selectedInventoryItem.price }}</p>
+            <p>
+              <strong>Descripcion:</strong>
+              {{ selectedInventoryItem.description }}
+            </p>
+          </CardContent>
+
+          <!-- <CardFooter class="flex flex-wrap justify-center gap-2">
+            <RouterLink
+              :to="{
+                name: 'vehicle-details',
+                params: { plate: selectedService.plate_number },
+              }"
+              class="w-[48%]"
+            >
+              <Button variant="outline" class="w-full cursor-pointer"
+                >Details</Button
+              >
+            </RouterLink>
+            <Button variant="outline" class="w-[48%]">Rent</Button>
+            <Button variant="outline" class="w-[48%]">Maintenance</Button>
+            <Button variant="outline" class="w-[48%]">Event</Button>
+          </CardFooter> -->
+        </Card>
+      </div>
+    </section>
   </main>
 </template>
 
@@ -301,5 +510,14 @@ const table = useVueTable({
 }
 .details-card.cancelled {
   box-shadow: 0 0 10px #f4433666;
+}
+.details-card.available {
+  box-shadow: 0 0 10px #4caf5066;
+}
+.details-card.no_stock {
+  box-shadow: 0 0 10px #f4433666;
+}
+.details-card.requested {
+  box-shadow: 0 0 10px #ff980066;
 }
 </style>
